@@ -1,0 +1,88 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:form id="formPlatos">
+        <p:growl id="msgsP" showDetail="true"/>
+        
+        <div class="grid">
+            <div class="col-12 md:col-4">
+                <p:card header="Configurar Menú" styleClass="card-custom shadow-2">
+                    <div class="ui-fluid">
+                        <div class="field mt-2">
+                            <p:outputLabel for="nomP" value="Nombre del Plato" styleClass="font-bold"/>
+                            <p:inputText id="nomP" value="#{platoBean.nuevoPlato.nombre}" required="true"/>
+                        </div>
+                        <div class="field mt-3">
+                            <p:outputLabel for="preP" value="Precio" styleClass="font-bold"/>
+                            <p:inputNumber id="preP" value="#{platoBean.nuevoPlato.precio}" symbol=" €" symbolPosition="s" required="true"/>
+                        </div>
+                        <p:commandButton value="Guardar Plato" 
+                                         action="#{platoBean.guardar}" 
+                                         update="@form :tabPrincipal:formPedidos :tabPrincipal:formLogs" 
+                                         process="@this nomP preP"
+                                         icon="pi pi-plus" 
+                                         styleClass="ui-button-warning mt-4"/>
+                    </div>
+                </p:card>
+            </div>
+
+            <div class="col-12 md:col-8">
+                <p:dataTable id="tablaPlatos" value="#{platoBean.platos}" var="pl" size="small">
+                    <p:column headerText="ID" width="50">#{pl.idPlato}</p:column>
+                    <p:column headerText="Nombre">#{pl.nombre}</p:column>
+                    <p:column headerText="Precio">
+                        <h:outputText value="#{pl.precio}">
+                            <f:convertNumber type="currency" currencySymbol="€"/>
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="Acciones" width="100" styleClass="text-center">
+                        <div class="flex justify-content-center">
+                            <p:commandButton icon="pi pi-pencil" 
+                                             action="#{platoBean.prepararEdicion(pl)}"
+                                             update=":tabPrincipal:formPlatos:panelEditarPlato"
+                                             oncomplete="PF('dlgEditarPlato').show()"
+                                             process="@this"
+                                             styleClass="ui-button-warning ui-button-flat mr-1"/>
+
+                            <p:commandButton icon="pi pi-trash" 
+                                             action="#{platoBean.eliminar(pl.idPlato)}"
+                                             update="@form :tabPrincipal:formPedidos :tabPrincipal:formLogs"
+                                             process="@this" 
+                                             styleClass="ui-button-danger ui-button-flat">
+                                <p:confirm header="Confirmar" message="¿Eliminar plato y sus pedidos?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </div>
+
+        <p:dialog header="Editar Plato" widgetVar="dlgEditarPlato" modal="true" responsive="true" width="400">
+            <p:outputPanel id="panelEditarPlato" class="ui-fluid">
+                <h:panelGroup rendered="#{not empty platoBean.platoEditado}">
+                    <div class="field">
+                        <p:outputLabel for="nomPE" value="Nombre" styleClass="font-bold"/>
+                        <p:inputText id="nomPE" value="#{platoBean.platoEditado.nombre}" required="true"/>
+                    </div>
+                    <div class="field mt-3">
+                        <p:outputLabel for="prePE" value="Precio" styleClass="font-bold"/>
+                        <p:inputNumber id="prePE" value="#{platoBean.platoEditado.precio}" symbol=" €" symbolPosition="s" required="true"/>
+                    </div>
+                    <div class="flex justify-content-end mt-4">
+                        <p:commandButton value="Actualizar" 
+                                         action="#{platoBean.actualizar}"
+                                         update="@form :tabPrincipal:formPedidos :tabPrincipal:formLogs"
+                                         process="@this nomPE prePE"
+                                         oncomplete="if (!args.validationFailed) PF('dlgEditarPlato').hide()"
+                                         icon="pi pi-save" 
+                                         styleClass="ui-button-primary"/>
+                    </div>
+                </h:panelGroup>
+            </p:outputPanel>
+        </p:dialog>
+    </h:form>
+</ui:composition>

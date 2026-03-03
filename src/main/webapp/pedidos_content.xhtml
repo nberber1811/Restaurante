@@ -1,0 +1,128 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:form id="formPedidos">
+        <p:growl id="msgs" showDetail="true"/>
+        
+        <div class="grid">
+            <div class="col-12 md:col-4">
+                <p:card header="Registrar Pedido" styleClass="card-custom shadow-2">
+                    <div class="ui-fluid">
+                        <div class="field mt-2">
+                            <p:outputLabel for="cli" value="Cliente" styleClass="font-bold"/>
+                            <p:selectOneMenu id="cli" value="#{pedidoBean.idClienteSel}" required="true">
+                                <f:selectItem itemLabel="-- Seleccionar --" itemValue=""/>
+                                <f:selectItems value="#{pedidoBean.clientes}" var="c" 
+                                               itemLabel="#{c.nombre}" itemValue="#{c.idCliente}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="field mt-3">
+                            <p:outputLabel for="pla" value="Plato" styleClass="font-bold"/>
+                            <p:selectOneMenu id="pla" value="#{pedidoBean.idPlatoSel}" required="true">
+                                <f:selectItem itemLabel="-- Seleccionar --" itemValue=""/>
+                                <f:selectItems value="#{pedidoBean.platos}" var="pl" 
+                                               itemLabel="#{pl.nombre}" itemValue="#{pl.idPlato}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="field mt-3">
+                            <p:outputLabel for="cant" value="Cantidad" styleClass="font-bold"/>
+                            <p:spinner id="cant" value="#{pedidoBean.nuevoPedido.cantidad}" min="1" required="true"/>
+                        </div>
+                        <p:commandButton value="Guardar Pedido" 
+                                         action="#{pedidoBean.guardar}" 
+                                         update="@form :tabPrincipal:formLogs" 
+                                         process="@this cli pla cant"
+                                         icon="pi pi-plus" 
+                                         styleClass="mt-4"/>
+                    </div>
+                </p:card>
+            </div>
+
+            <div class="col-12 md:col-8">
+                <p:dataTable id="listadoPedidos" value="#{pedidoBean.pedidos}" var="ped" stripedRows="true" size="small">
+                    <p:column headerText="ID" width="50">#{ped.idPedido}</p:column>
+                    <p:column headerText="Cliente">#{ped.cliente.nombre}</p:column>
+                    <p:column headerText="Plato">#{ped.plato.nombre}</p:column>
+                    <p:column headerText="Cant." width="60" styleClass="text-center">
+                        <p:badge value="#{ped.cantidad}" severity="info"/>
+                    </p:column>
+                    
+                    <p:column headerText="Acciones" width="100" styleClass="text-center">
+                        <div class="flex justify-content-center">
+                            <p:commandButton icon="pi pi-pencil" 
+                                             action="#{pedidoBean.prepararEdicion(ped)}"
+                                             update=":tabPrincipal:formPedidos:panelEditarPedido"
+                                             oncomplete="PF('dlgEditarPedido').show()"
+                                             process="@this"
+                                             styleClass="ui-button-warning ui-button-flat mr-1"/>
+
+                            <p:commandButton icon="pi pi-trash" 
+                                             action="#{pedidoBean.eliminar(ped.idPedido)}" 
+                                             update="@form :tabPrincipal:formLogs" 
+                                             process="@this"
+                                             styleClass="ui-button-danger ui-button-flat">
+                                <p:confirm header="Confirmar" message="¿Desea borrar el pedido?" icon="pi pi-trash"/>
+                            </p:commandButton>
+                        </div>
+                    </p:column>
+					<p:column headerText="Total" width="100" styleClass="text-right font-bold">
+					    <h:outputText value="#{ped.total}">
+					        <f:convertNumber type="currency" currencySymbol="€"/>
+					    </h:outputText>
+					</p:column>
+					<p:columnGroup type="footer">
+						<p:row>
+							<p:column colspan="4" style="text-align:right" footerText="Recaudación Total:" />
+							    <p:column style="text-align:right">
+							    	<f:facet name="footer">
+							        	<h:outputText value="#{pedidoBean.sumaTotalVentas}">
+							            	<f:convertNumber type="currency" currencySymbol="€"/>
+							            </h:outputText>
+							        </f:facet>
+								</p:column>
+							<p:column /> 
+						</p:row>
+					</p:columnGroup>
+                </p:dataTable>
+            </div>
+        </div>
+
+        <p:dialog header="Editar Pedido" widgetVar="dlgEditarPedido" modal="true" responsive="true" width="450">
+            <p:outputPanel id="panelEditarPedido" class="ui-fluid">
+                <h:panelGroup rendered="#{not empty pedidoBean.pedidoEditado}">
+                    <div class="field">
+                        <p:outputLabel for="cliE" value="Cambiar Cliente" styleClass="font-bold"/>
+                        <p:selectOneMenu id="cliE" value="#{pedidoBean.idClienteSel}" required="true">
+                            <f:selectItems value="#{pedidoBean.clientes}" var="c" 
+                                           itemLabel="#{c.nombre}" itemValue="#{c.idCliente}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="field mt-3">
+                        <p:outputLabel for="plaE" value="Cambiar Plato" styleClass="font-bold"/>
+                        <p:selectOneMenu id="plaE" value="#{pedidoBean.idPlatoSel}" required="true">
+                            <f:selectItems value="#{pedidoBean.platos}" var="pl" 
+                                           itemLabel="#{pl.nombre}" itemValue="#{pl.idPlato}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="field mt-3">
+                        <p:outputLabel for="cantE" value="Cantidad" styleClass="font-bold"/>
+                        <p:spinner id="cantE" value="#{pedidoBean.pedidoEditado.cantidad}" min="1" required="true"/>
+                    </div>
+                    
+                    <div class="flex justify-content-end mt-4">
+                        <p:commandButton value="Actualizar Pedido" 
+                                         action="#{pedidoBean.actualizar}"
+                                         update="@form :tabPrincipal:formLogs"
+                                         process="@this cliE plaE cantE"
+                                         oncomplete="if (!args.validationFailed) PF('dlgEditarPedido').hide()"
+                                         icon="pi pi-save" 
+                                         styleClass="ui-button-primary"/>
+                    </div>
+                </h:panelGroup>
+            </p:outputPanel>
+        </p:dialog>
+    </h:form>
+</ui:composition>

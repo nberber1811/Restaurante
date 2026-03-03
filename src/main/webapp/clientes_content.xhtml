@@ -1,0 +1,84 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:form id="formClientes">
+        <p:growl id="msgsC" showDetail="true"/>
+        
+        <div class="grid">
+            <div class="col-12 md:col-4">
+                <p:card header="Nuevo Cliente" styleClass="card-custom shadow-2">
+                    <div class="ui-fluid">
+                        <div class="field mt-2">
+                            <p:outputLabel for="nom" value="Nombre Completo" styleClass="font-bold"/>
+                            <p:inputText id="nom" value="#{clienteBean.nuevoCliente.nombre}" required="true"/>
+                        </div>
+                        <div class="field mt-3">
+                            <p:outputLabel for="tel" value="Teléfono" styleClass="font-bold"/>
+                            <p:inputText id="tel" value="#{clienteBean.nuevoCliente.telefono}"/>
+                        </div>
+                        <p:commandButton value="Añadir Cliente" 
+                                         action="#{clienteBean.guardar}" 
+                                         update="@form :tabPrincipal:formPedidos :tabPrincipal:formLogs" 
+                                         process="@this nom tel" 
+                                         icon="pi pi-user-plus" 
+                                         styleClass="ui-button-success mt-4"/>
+                    </div>
+                </p:card>
+            </div>
+
+            <div class="col-12 md:col-8">
+                <p:dataTable id="tablaClientes" value="#{clienteBean.clientes}" var="c" size="small">
+                    <p:column headerText="ID" width="50">#{c.idCliente}</p:column>
+                    <p:column headerText="Nombre">#{c.nombre}</p:column>
+                    <p:column headerText="Teléfono">#{c.telefono}</p:column>
+                    
+                    <p:column headerText="Acciones" width="100" styleClass="text-center">
+                        <div class="flex justify-content-center">
+                            <p:commandButton icon="pi pi-pencil" 
+                                             action="#{clienteBean.prepararEdicion(c)}"
+                                             update=":tabPrincipal:formClientes:panelEditar"
+                                             oncomplete="PF('dlgEditar').show()"
+                                             process="@this"
+                                             styleClass="ui-button-warning ui-button-flat mr-1"/>
+
+                            <p:commandButton icon="pi pi-trash" 
+                                             action="#{clienteBean.eliminar(c.idCliente)}"
+                                             update="@form :tabPrincipal:formPedidos :tabPrincipal:formLogs"
+                                             process="@this" 
+                                             styleClass="ui-button-danger ui-button-flat">
+                                <p:confirm header="Confirmar" message="¿Eliminar cliente y sus pedidos?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </div>
+
+        <p:dialog header="Editar Cliente" widgetVar="dlgEditar" modal="true" responsive="true" width="400">
+            <p:outputPanel id="panelEditar" class="ui-fluid">
+                <h:panelGroup rendered="#{not empty clienteBean.clienteEditado}">
+                    <div class="field">
+                        <p:outputLabel for="nomE" value="Nombre" styleClass="font-bold"/>
+                        <p:inputText id="nomE" value="#{clienteBean.clienteEditado.nombre}" required="true"/>
+                    </div>
+                    <div class="field mt-3">
+                        <p:outputLabel for="telE" value="Teléfono" styleClass="font-bold"/>
+                        <p:inputText id="telE" value="#{clienteBean.clienteEditado.telefono}"/>
+                    </div>
+                    <div class="flex justify-content-end mt-4">
+                        <p:commandButton value="Guardar Cambios" 
+                                         action="#{clienteBean.actualizar}"
+                                         update="@form :tabPrincipal:formPedidos :tabPrincipal:formLogs"
+                                         process="@this nomE telE"
+                                         oncomplete="if (!args.validationFailed) PF('dlgEditar').hide()"
+                                         icon="pi pi-save" 
+                                         styleClass="ui-button-primary"/>
+                    </div>
+                </h:panelGroup>
+            </p:outputPanel>
+        </p:dialog>
+    </h:form>
+</ui:composition>

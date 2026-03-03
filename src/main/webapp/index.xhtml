@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <title>Restaurante Manager Pro</title>
+    <link rel="stylesheet" href="https://unpkg.com/primeflex@3.3.1/primeflex.css"/>
+    
+    <style>
+        /* Estilos Globales */
+        body { background-color: #f4f7f9; margin: 0; font-family: var(--font-family); }
+        .header-app { background: linear-gradient(90deg, #2c3e50 0%, #4ca1af 100%); color: white; }
+        .main-content { padding: 4rem; }
+        .card-custom { border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important; }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="header-app p-4 shadow-2 mb-4">
+        <div class="flex align-items-center justify-content-between">
+            <span class="text-2xl font-bold"><i class="pi pi-bolt mr-2"></i>RESTAURANTE APP</span>
+            <span>Admin Panel v2.0</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <p:tabView id="tabPrincipal" dynamic="true" cache="false">
+            
+            <p:tab title="Pedidos">
+                <f:facet name="title"><i class="pi pi-shopping-cart mr-2"></i>Pedidos</f:facet>
+                <ui:include src="pedidos_content.xhtml" />
+            </p:tab>
+
+            <p:tab title="Clientes">
+                <f:facet name="title"><i class="pi pi-users mr-2"></i>Clientes</f:facet>
+                <ui:include src="clientes_content.xhtml" />
+            </p:tab>
+
+            <p:tab title="Platos (Menú)">
+                <f:facet name="title"><i class="pi pi-list mr-2"></i>Menú</f:facet>
+                <ui:include src="platos_content.xhtml" />
+            </p:tab>
+			
+            <p:tab title="Historial (Logs)">
+                <f:facet name="title"><i class="pi pi-history mr-2"></i>Logs</f:facet>
+				<ui:include src="logs_content.xhtml" />
+            </p:tab>
+
+        </p:tabView>
+    </div>
+
+    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+        <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" />
+    </p:confirmDialog>
+</h:body>
+</html>
